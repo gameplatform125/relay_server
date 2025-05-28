@@ -33,20 +33,6 @@ async def main():
     async with websockets.serve(relay, "0.0.0.0", port):
         await asyncio.Future()  # sonsuza kadar bekle
 
-def run_http_server():
-    class Handler(BaseHTTPRequestHandler):
-        def do_HEAD(self):
-            self.send_response(200)
-            self.end_headers()
-        def do_GET(self):
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b"OK")
-    server = HTTPServer(('0.0.0.0', 10000), Handler)
-    server.serve_forever()
-
-threading.Thread(target=run_http_server, daemon=True).start()
-
 if __name__ == "__main__":
     asyncio.run(main())
 
