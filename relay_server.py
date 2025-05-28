@@ -1,5 +1,7 @@
 import asyncio
 import websockets
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 rooms = {}
 
@@ -31,6 +33,20 @@ async def main():
     print("Relay sunucu başlatıldı, port 8765")
     async with websockets.serve(relay, "0.0.0.0", 8765):
         await asyncio.Future()  # sonsuza kadar bekle
+
+def run_http_server():
+    class Handler(BaseHTTPRequestHandler):
+        def do_HEAD(self):
+            self.send_response(200)
+            self.end_headers()
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"OK")
+    server = HTTPServer(('0.0.0.0', 10000), Handler)
+    server.serve_forever()
+
+threading.Thread(target=run_http_server, daemon=True).start()
 
 if __name__ == "__main__":
     asyncio.run(main()) 
