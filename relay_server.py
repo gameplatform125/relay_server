@@ -1,3 +1,4 @@
+import os
 import asyncio
 import websockets
 import threading
@@ -7,7 +8,6 @@ rooms = {}
 
 async def relay(websocket, path):
     try:
-        # İlk mesaj: oda kodu
         room_code = await websocket.recv()
         if room_code not in rooms:
             rooms[room_code] = []
@@ -16,22 +16,21 @@ async def relay(websocket, path):
 
         while True:
             msg = await websocket.recv()
-            # Oda içindeki diğer herkese ilet
             for ws in rooms[room_code]:
                 if ws != websocket:
                     await ws.send(msg)
     except Exception as e:
         print("Bağlantı koptu:", e)
     finally:
-        # Temizlik
         if room_code in rooms:
             rooms[room_code].remove(websocket)
             if not rooms[room_code]:
                 del rooms[room_code]
 
 async def main():
-    print("Relay sunucu başlatıldı, port 8765")
-    async with websockets.serve(relay, "0.0.0.0", 8765):
+    port = int(os.environ.get("PORT", 8765))  # Render'ın verdiği portu dinle
+    print(f"Relay sunucu başlatıldı, port {port}")
+    async with websockets.serve(relay, "0.0.0.0", port):
         await asyncio.Future()  # sonsuza kadar bekle
 
 def run_http_server():
@@ -49,4 +48,5 @@ def run_http_server():
 threading.Thread(target=run_http_server, daemon=True).start()
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())
+
