@@ -27,7 +27,10 @@ async def relay(websocket, path):
             if not rooms[room_code]:
                 del rooms[room_code]
 
-start_server = websockets.serve(relay, "0.0.0.0", 8765)
-print("Relay sunucu başlatıldı, port 8765")
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever() 
+async def main():
+    print("Relay sunucu başlatıldı, port 8765")
+    async with websockets.serve(relay, "0.0.0.0", 8765):
+        await asyncio.Future()  # sonsuza kadar bekle
+
+if __name__ == "__main__":
+    asyncio.run(main()) 
