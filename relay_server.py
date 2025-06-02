@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 rooms = {}
 
-async def relay(websocket, path):
+async def relay(websocket):
     try:
         room_code = await websocket.recv()
         if room_code not in rooms:
